@@ -1,0 +1,42 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "steel-mill-ai-platform", "steel-mill-ai-platform", "{AC19DBF1-B083-788D-A6AB-DBCC8DE4F28F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{19705F79-7DF0-2776-93B1-49052F71B4A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteelMillShared", "steel-mill-ai-platform\shared\models\SteelMillShared.csproj", "{D359B327-3423-FB22-DDC3-37D97491D731}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{B34B3E75-C545-2E76-7884-FC0250944F3F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FurnaceService", "steel-mill-ai-platform\services\furnace-service\FurnaceService.csproj", "{0C80FA83-0BD8-08F5-E945-3CDB93C42213}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D359B327-3423-FB22-DDC3-37D97491D731}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D359B327-3423-FB22-DDC3-37D97491D731}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D359B327-3423-FB22-DDC3-37D97491D731}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D359B327-3423-FB22-DDC3-37D97491D731}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C80FA83-0BD8-08F5-E945-3CDB93C42213}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C80FA83-0BD8-08F5-E945-3CDB93C42213}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C80FA83-0BD8-08F5-E945-3CDB93C42213}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C80FA83-0BD8-08F5-E945-3CDB93C42213}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{19705F79-7DF0-2776-93B1-49052F71B4A0} = {AC19DBF1-B083-788D-A6AB-DBCC8DE4F28F}
+		{D359B327-3423-FB22-DDC3-37D97491D731} = {19705F79-7DF0-2776-93B1-49052F71B4A0}
+		{B34B3E75-C545-2E76-7884-FC0250944F3F} = {AC19DBF1-B083-788D-A6AB-DBCC8DE4F28F}
+		{0C80FA83-0BD8-08F5-E945-3CDB93C42213} = {B34B3E75-C545-2E76-7884-FC0250944F3F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0CBE2CAC-76D8-415D-80EF-5317B683C76F}
+	EndGlobalSection
+EndGlobal
