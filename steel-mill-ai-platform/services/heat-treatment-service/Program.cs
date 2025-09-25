@@ -1,5 +1,5 @@
 using Azure.Messaging.EventHubs.Consumer;
-using RollingMillService.Services;
+using HeatTreatmentService.Services;
 using Microsoft.Azure.Cosmos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -31,10 +31,7 @@ builder.Services.AddSingleton<CosmosClient>(sp =>
 });
 
 // Services
-builder.Services.AddSingleton<IEventProcessorService, EventProcessorService>();
-builder.Services.AddSingleton<IRollingMillDataService, RollingMillDataService>();
-builder.Services.AddSingleton<IRebarRollingDataService, RebarRollingDataService>();
-builder.Services.AddHostedService<EventHubConsumerService>();
+builder.Services.AddSingleton<IHeatTreatmentDataService, HeatTreatmentDataService>();
 
 // Azure clients
 builder.Services.AddAzureClients(clientBuilder =>
