@@ -1,0 +1,210 @@
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: steel-mill
+spec:
+  mtls:
+    mode: STRICT
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: ml-inference-policy
+  namespace: steel-mill
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: ml-inference
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/steel-mill/sa/steel-mill-platform"]
+  - to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/predict/*", "/health", "/metrics", "/monitoring/*", "/models/*"]
+  - when:
+    - key: request.headers[content-type]
+      values: ["application/json", "text/plain"]
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: microservices-policy
+  namespace: steel-mill
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: steel-mill-platform
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/steel-mill/sa/steel-mill-platform"]
+    - source:
+        namespaces: ["istio-system"]
+  - to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/*", "/health/*", "/metrics"]
+  - when:
+    - key: request.headers[authorization]
+      notValues: [""]
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: dashboard-policy
+  namespace: steel-mill
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: dashboard
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        namespaces: ["istio-system"]
+  - to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/*"]
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: jwt-auth
+  namespace: steel-mill
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: steel-mill-platform
+  jwtRules:
+  - issuer: "https://login.microsoftonline.com/YOUR_TENANT_ID/v2.0"
+    jwksUri: "https://login.microsoftonline.com/YOUR_TENANT_ID/discovery/v2.0/keys"
+    audiences:
+    - "api://steel-mill-platform"
+    outputPayloadToHeader: "x-jwt-payload"
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: azure-services
+  namespace: steel-mill
+spec:
+  hosts:
+  - "*.cosmos.azure.com"
+  - "*.servicebus.windows.net"
+  - "*.eventhub.azure.net"
+  - "*.blob.core.windows.net"
+  - "*.vault.azure.net"
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  location: MESH_EXTERNAL
+  resolution: DNS
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Telemetry
+metadata:
+  name: default-metrics
+  namespace: steel-mill
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: ALL_METRICS
+      tagOverrides:
+        destination_service_name:
+          value: "{{.destination_service_name | default \"unknown\"}}"
+        destination_service_namespace:
+          value: "{{.destination_service_namespace | default \"unknown\"}}"
+        request_protocol:
+          value: "{{.request_protocol | default \"unknown\"}}"
+        response_code:
+          value: "{{.response_code | default \"unknown\"}}"
+
+---
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: steel-mill-istio
+  namespace: istio-system
+spec:
+  values:
+    pilot:
+      traceSampling: 5.0
+    global:
+      meshID: steel-mill-mesh
+      multiCluster:
+        clusterName: steel-mill-cluster
+      network: steel-mill-network
+    sidecarInjectorWebhook:
+      rewriteAppHTTPProbe: true
+  components:
+    pilot:
+      k8s:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        hpaSpec:
+          minReplicas: 2
+          maxReplicas: 5
+          metrics:
+          - type: Resource
+            resource:
+              name: cpu
+              target:
+                type: Utilization
+                averageUtilization: 70
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+      k8s:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 2000m
+            memory: 1024Mi
+        hpaSpec:
+          minReplicas: 2
+          maxReplicas: 10
+          metrics:
+          - type: Resource
+            resource:
+              name: cpu
+              target:
+                type: Utilization
+                averageUtilization: 70
+        service:
+          type: LoadBalancer
+          annotations:
+            service.beta.kubernetes.io/azure-load-balancer-internal: "false"
+    egressGateways:
+    - name: istio-egressgateway
+      enabled: true
+      k8s:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi

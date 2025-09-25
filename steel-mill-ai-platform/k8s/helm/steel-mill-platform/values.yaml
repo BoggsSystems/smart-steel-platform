@@ -1,0 +1,303 @@
+# Global configuration
+global:
+  imageRegistry: ""
+  storageClass: ""
+  
+# Platform configuration
+platform:
+  namespace: steel-mill
+  environment: production
+  
+# Image configuration
+image:
+  registry: steelmillacr.azurecr.io
+  pullPolicy: Always
+  pullSecrets:
+    - name: acr-secret
+
+# Service configuration
+services:
+  furnace:
+    enabled: true
+    name: furnace-service
+    image: furnace-service:latest
+    port: 80
+    replicas: 3
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+    
+  rollingMill:
+    enabled: true
+    name: rolling-mill-service
+    image: rolling-mill-service:latest
+    port: 80
+    replicas: 5
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+        
+  scrapIntake:
+    enabled: true
+    name: scrap-intake-service
+    image: scrap-intake-service:latest
+    port: 80
+    replicas: 2
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+        
+  casting:
+    enabled: true
+    name: casting-service
+    image: casting-service:latest
+    port: 80
+    replicas: 3
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+        
+  packaging:
+    enabled: true
+    name: packaging-service
+    image: packaging-service:latest
+    port: 80
+    replicas: 2
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+        
+  shipping:
+    enabled: true
+    name: shipping-service
+    image: shipping-service:latest
+    port: 80
+    replicas: 2
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+# ML Services
+mlServices:
+  inference:
+    enabled: true
+    name: ml-inference-service
+    image: ml-inference-service:latest
+    port: 8000
+    replicas: 3
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+  
+  training:
+    enabled: true
+    name: ml-training-service
+    image: ml-training-service:latest
+    schedule: "0 2 * * *"  # Daily at 2 AM
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "1000m"
+      limits:
+        memory: "8Gi"
+        cpu: "4000m"
+
+# Frontend
+frontend:
+  enabled: true
+  name: dashboard
+  image: dashboard:latest
+  port: 3000
+  replicas: 2
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: steelmill.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: dashboard
+        - path: /api
+          pathType: Prefix
+          service: api-gateway
+        - path: /ml
+          pathType: Prefix
+          service: ml-inference-service
+  tls:
+    - secretName: steelmill-tls
+      hosts:
+        - steelmill.yourdomain.com
+
+# Autoscaling configuration
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Service Mesh (Istio)
+serviceMesh:
+  enabled: true
+  istio:
+    gateway:
+      enabled: true
+      hosts:
+        - steelmill.yourdomain.com
+    virtualService:
+      enabled: true
+    destinationRule:
+      enabled: true
+      trafficPolicy:
+        tls:
+          mode: ISTIO_MUTUAL
+
+# Security configuration
+security:
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    fsGroup: 1001
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    capabilities:
+      drop:
+        - ALL
+
+# Database dependencies
+postgresql:
+  enabled: false  # Using Azure SQL Database
+  
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    existingSecret: redis-secret
+  master:
+    persistence:
+      enabled: true
+      storageClass: managed-premium
+      size: 8Gi
+  replica:
+    replicaCount: 2
+    persistence:
+      enabled: true
+      storageClass: managed-premium
+      size: 8Gi
+
+influxdb:
+  enabled: true
+  persistence:
+    enabled: true
+    storageClass: managed-premium
+    size: 50Gi
+  config:
+    http:
+      auth-enabled: true
+    data:
+      max-series-per-database: 1000000
+      max-values-per-tag: 100000
+
+# Monitoring stack
+monitoring:
+  prometheus:
+    enabled: true
+    server:
+      persistentVolume:
+        storageClass: managed-premium
+        size: 50Gi
+      retention: "30d"
+    alertmanager:
+      enabled: true
+      persistentVolume:
+        storageClass: managed-premium
+        size: 10Gi
+        
+  grafana:
+    enabled: true
+    persistence:
+      enabled: true
+      storageClassName: managed-premium
+      size: 10Gi
+    adminPassword: ""  # Will be generated
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+    sidecar:
+      dashboards:
+        enabled: true
+        searchNamespace: ALL
+
+# Configuration for external Azure services
+azure:
+  cosmosDb:
+    endpoint: ""
+    secretName: cosmos-secret
+  eventHub:
+    connectionString: ""
+    secretName: eventhub-secret
+  serviceBus:
+    connectionString: ""
+    secretName: servicebus-secret
+  storage:
+    connectionString: ""
+    secretName: storage-secret
+  keyVault:
+    name: ""
+    secretName: keyvault-secret
+
+# Development/testing overrides
+development:
+  enabled: false
+  replicas: 1
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi" 
+      cpu: "100m"

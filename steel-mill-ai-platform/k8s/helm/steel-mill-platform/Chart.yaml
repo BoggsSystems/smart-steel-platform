@@ -1,0 +1,37 @@
+apiVersion: v2
+name: steel-mill-platform
+description: A Helm chart for Steel Mill AI Platform
+type: application
+version: 2.0.0
+appVersion: "2.0.0"
+home: https://github.com/steel-mill-ai/platform
+maintainers:
+  - name: Steel Mill AI Team
+    email: team@steelmill-ai.com
+keywords:
+  - steel
+  - manufacturing
+  - iot
+  - ai
+  - machine-learning
+dependencies:
+  - name: postgresql
+    version: "12.8.2"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+  - name: redis
+    version: "17.11.3"
+    repository: "https://charts.bitnami.com/bitnami" 
+    condition: redis.enabled
+  - name: influxdb
+    version: "4.12.0"
+    repository: "https://helm.influxdata.com/"
+    condition: influxdb.enabled
+  - name: prometheus
+    version: "25.1.0"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: monitoring.prometheus.enabled
+  - name: grafana
+    version: "6.58.9" 
+    repository: "https://grafana.github.io/helm-charts"
+    condition: monitoring.grafana.enabled

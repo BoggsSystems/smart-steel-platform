@@ -1,0 +1,29 @@
+{{- range $serviceName, $service := .Values.services }}
+{{- if $service.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $service.name }}
+  namespace: {{ $.Values.platform.namespace }}
+  labels:
+    {{- include "steel-mill-platform.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $serviceName }}
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: metrics
+    protocol: TCP
+  selector:
+    {{- include "steel-mill-platform.selectorLabels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $serviceName }}
+{{- end }}
+{{- end }}

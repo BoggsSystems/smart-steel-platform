@@ -1,0 +1,167 @@
+{{- if .Values.mlServices.inference.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.mlServices.inference.name }}
+  namespace: {{ .Values.platform.namespace }}
+  labels:
+    {{- include "steel-mill-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ml-inference
+spec:
+  replicas: {{ if .Values.development.enabled }}1{{ else }}{{ .Values.mlServices.inference.replicas }}{{ end }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0  # Zero downtime for ML inference
+  selector:
+    matchLabels:
+      {{- include "steel-mill-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: ml-inference
+  template:
+    metadata:
+      labels:
+        {{- include "steel-mill-platform.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: ml-inference
+        version: {{ .Chart.AppVersion }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.mlServices.inference.port }}"
+        prometheus.io/path: "/metrics"
+        sidecar.istio.io/inject: "{{ .Values.serviceMesh.enabled }}"
+        # Model version annotation for tracking
+        ml.steelmill.ai/model-version: "{{ .Chart.AppVersion }}"
+    spec:
+      serviceAccountName: {{ include "steel-mill-platform.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.security.podSecurityContext | nindent 8 }}
+      initContainers:
+      - name: model-downloader
+        image: "{{ .Values.image.registry }}/model-downloader:latest"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - sh
+        - -c
+        - |
+          echo "Downloading latest models..."
+          # Download models from Azure Blob Storage or Model Registry
+          python /app/download_models.py --output /shared/models
+        env:
+        - name: AZURE_STORAGE_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.azure.storage.secretName }}
+              key: connectionString
+        volumeMounts:
+        - name: model-storage
+          mountPath: /shared/models
+        securityContext:
+          {{- toYaml .Values.security.containerSecurityContext | nindent 10 }}
+      containers:
+      - name: ml-inference
+        image: "{{ .Values.image.registry }}/{{ .Values.mlServices.inference.image }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.mlServices.inference.port }}
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: MODEL_PATH
+          value: "/app/models"
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: redis-secret
+              key: redis-url
+        - name: INFLUXDB_URL
+          value: "http://{{ .Release.Name }}-influxdb:8086"
+        - name: INFLUXDB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: influxdb-secret
+              key: admin-token
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 10
+        {{- if .Values.development.enabled }}
+        resources:
+          requests:
+            memory: {{ .Values.development.resources.requests.memory }}
+            cpu: {{ .Values.development.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.development.resources.limits.memory }}
+            cpu: {{ .Values.development.resources.limits.cpu }}
+        {{- else }}
+        resources:
+          requests:
+            memory: {{ .Values.mlServices.inference.resources.requests.memory }}
+            cpu: {{ .Values.mlServices.inference.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.mlServices.inference.resources.limits.memory }}
+            cpu: {{ .Values.mlServices.inference.resources.limits.cpu }}
+        {{- end }}
+        securityContext:
+          {{- toYaml .Values.security.containerSecurityContext | nindent 10 }}
+        volumeMounts:
+        - name: model-storage
+          mountPath: /app/models
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+        - name: cache
+          mountPath: /app/cache
+      volumes:
+      - name: model-storage
+        emptyDir:
+          sizeLimit: 10Gi
+      - name: tmp
+        emptyDir: {}
+      - name: cache
+        emptyDir:
+          sizeLimit: 1Gi
+      {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations: []
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                  - ml-inference
+              topologyKey: kubernetes.io/hostname
+{{- end }}

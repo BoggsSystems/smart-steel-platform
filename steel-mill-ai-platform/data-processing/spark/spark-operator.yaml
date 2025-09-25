@@ -1,0 +1,271 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: spark-operator
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spark-operator
+  namespace: spark-operator
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: spark-operator
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["*"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["*"]
+- apiGroups: ["sparkoperator.k8s.io"]
+  resources: ["sparkapplications", "scheduledsparkapplications"]
+  verbs: ["*"]
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["mutatingadmissionwebhooks", "validatingadmissionwebhooks"]
+  verbs: ["*"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: spark-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: spark-operator
+subjects:
+- kind: ServiceAccount
+  name: spark-operator
+  namespace: spark-operator
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-operator
+  namespace: spark-operator
+  labels:
+    app.kubernetes.io/name: spark-operator
+    app.kubernetes.io/version: "1.3.8"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: spark-operator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: spark-operator
+    spec:
+      serviceAccountName: spark-operator
+      containers:
+      - name: spark-operator
+        image: ghcr.io/googlecloudplatform/spark-operator:v1beta2-1.3.8-3.1.1
+        imagePullPolicy: IfNotPresent
+        args:
+        - -v=2
+        - -logtostderr
+        - -namespace=steel-mill
+        - -enable-batch-scheduler=true
+        - -enable-metrics=true
+        - -metrics-labels=app_type
+        - -metrics-port=10254
+        - -metrics-endpoint=/metrics
+        - -metrics-prefix=spark_operator_
+        ports:
+        - name: metrics
+          containerPort: 10254
+          protocol: TCP
+        env:
+        - name: SPARK_OPERATOR_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          requests:
+            cpu: 100m
+            memory: 300Mi
+          limits:
+            cpu: 200m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-operator-metrics
+  namespace: spark-operator
+  labels:
+    app.kubernetes.io/name: spark-operator
+spec:
+  ports:
+  - name: metrics
+    port: 10254
+    protocol: TCP
+    targetPort: metrics
+  selector:
+    app.kubernetes.io/name: spark-operator
+
+---
+apiVersion: sparkoperator.k8s.io/v1beta2
+kind: SparkApplication
+metadata:
+  name: steel-mill-etl
+  namespace: steel-mill
+spec:
+  type: Scala
+  mode: cluster
+  image: "steelmillacr.azurecr.io/spark-steel-mill:latest"
+  imagePullPolicy: Always
+  mainClass: com.steelmill.etl.DataProcessor
+  mainApplicationFile: "local:///opt/spark/examples/jars/steel-mill-etl.jar"
+  sparkVersion: "3.4.1"
+  restartPolicy:
+    type: OnFailure
+    onFailureRetries: 3
+    onFailureRetryInterval: 10
+    onSubmissionFailureRetries: 5
+    onSubmissionFailureRetryInterval: 20
+  volumes:
+    - name: "test-volume"
+      hostPath:
+        path: "/tmp"
+        type: Directory
+  driver:
+    cores: 1
+    coreLimit: "1200m"
+    memory: "2g"
+    labels:
+      version: 3.1.1
+      app: steel-mill-etl
+    serviceAccount: spark-operator
+    volumeMounts:
+      - name: "test-volume"
+        mountPath: "/tmp"
+    env:
+      - name: AZURE_STORAGE_CONNECTION_STRING
+        valueFrom:
+          secretKeyRef:
+            name: storage-secret
+            key: connectionString
+      - name: COSMOS_DB_ENDPOINT
+        valueFrom:
+          secretKeyRef:
+            name: cosmos-secret
+            key: endpoint
+      - name: COSMOS_DB_KEY
+        valueFrom:
+          secretKeyRef:
+            name: cosmos-secret
+            key: primaryKey
+  executor:
+    cores: 1
+    instances: 3
+    memory: "2g"
+    labels:
+      version: 3.1.1
+      app: steel-mill-etl
+    volumeMounts:
+      - name: "test-volume"
+        mountPath: "/tmp"
+    env:
+      - name: AZURE_STORAGE_CONNECTION_STRING
+        valueFrom:
+          secretKeyRef:
+            name: storage-secret
+            key: connectionString
+  monitoring:
+    exposeDriverMetrics: true
+    exposeExecutorMetrics: true
+    prometheus:
+      jmxExporterJar: "/prometheus/jmx_prometheus_javaagent-0.17.0.jar"
+      port: 8090
+  sparkConf:
+    "spark.sql.adaptive.enabled": "true"
+    "spark.sql.adaptive.coalescePartitions.enabled": "true"
+    "spark.sql.adaptive.skewJoin.enabled": "true"
+    "spark.serializer": "org.apache.spark.serializer.KryoSerializer"
+    "spark.sql.streaming.forceDeleteTempCheckpointLocation": "true"
+    "spark.kubernetes.allocation.batch.size": "5"
+    "spark.kubernetes.allocation.batch.delay": "1s"
+  hadoopConf:
+    "fs.azure.account.auth.type": "SharedKey"
+    "fs.azure.account.key.steelmillstorage.blob.core.windows.net": "$(AZURE_STORAGE_ACCOUNT_KEY)"
+
+---
+apiVersion: sparkoperator.k8s.io/v1beta2
+kind: ScheduledSparkApplication
+metadata:
+  name: steel-mill-daily-etl
+  namespace: steel-mill
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  concurrencyPolicy: Forbid
+  template:
+    type: Scala
+    mode: cluster
+    image: "steelmillacr.azurecr.io/spark-steel-mill:latest"
+    imagePullPolicy: Always
+    mainClass: com.steelmill.etl.DailyProcessor
+    mainApplicationFile: "local:///opt/spark/examples/jars/steel-mill-etl.jar"
+    sparkVersion: "3.4.1"
+    restartPolicy:
+      type: OnFailure
+      onFailureRetries: 3
+      onFailureRetryInterval: 10
+      onSubmissionFailureRetries: 5
+      onSubmissionFailureRetryInterval: 20
+    driver:
+      cores: 2
+      coreLimit: "2000m"
+      memory: "4g"
+      labels:
+        version: 3.1.1
+        app: steel-mill-daily-etl
+      serviceAccount: spark-operator
+      env:
+        - name: AZURE_STORAGE_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: storage-secret
+              key: connectionString
+        - name: COSMOS_DB_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: cosmos-secret
+              key: endpoint
+        - name: COSMOS_DB_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cosmos-secret
+              key: primaryKey
+    executor:
+      cores: 2
+      instances: 5
+      memory: "4g"
+      labels:
+        version: 3.1.1
+        app: steel-mill-daily-etl
+      env:
+        - name: AZURE_STORAGE_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: storage-secret
+              key: connectionString
+    sparkConf:
+      "spark.sql.adaptive.enabled": "true"
+      "spark.sql.adaptive.coalescePartitions.enabled": "true" 
+      "spark.sql.adaptive.skewJoin.enabled": "true"
+      "spark.serializer": "org.apache.spark.serializer.KryoSerializer"
+      "spark.kubernetes.allocation.batch.size": "10"
+      "spark.kubernetes.allocation.batch.delay": "1s"

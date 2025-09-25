@@ -1,0 +1,237 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: steel-mill-gateway
+  namespace: steel-mill
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: steelmill-tls
+    hosts:
+    - steelmill.yourdomain.com
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - steelmill.yourdomain.com
+    tls:
+      httpsRedirect: true
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: steel-mill-vs
+  namespace: steel-mill
+spec:
+  hosts:
+  - steelmill.yourdomain.com
+  gateways:
+  - steel-mill-gateway
+  http:
+  # Dashboard routes
+  - match:
+    - uri:
+        prefix: /
+    - uri:
+        prefix: /dashboard
+    route:
+    - destination:
+        host: dashboard
+        port:
+          number: 80
+      weight: 100
+    fault:
+      delay:
+        percentage:
+          value: 0.1
+        fixedDelay: 5s
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
+    timeout: 10s
+  
+  # ML inference routes with advanced traffic management
+  - match:
+    - uri:
+        prefix: /ml
+    route:
+    - destination:
+        host: ml-inference-service
+        port:
+          number: 8000
+        subset: stable
+      weight: 90
+    - destination:
+        host: ml-inference-service
+        port:
+          number: 8000
+        subset: canary
+      weight: 10
+    fault:
+      delay:
+        percentage:
+          value: 0.01
+        fixedDelay: 1s
+    retries:
+      attempts: 2
+      perTryTimeout: 5s
+    timeout: 30s
+  
+  # Microservices API routes
+  - match:
+    - uri:
+        prefix: /api/furnace
+    route:
+    - destination:
+        host: furnace-service
+        port:
+          number: 80
+      weight: 100
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+    timeout: 30s
+  
+  - match:
+    - uri:
+        prefix: /api/rolling-mill
+    route:
+    - destination:
+        host: rolling-mill-service
+        port:
+          number: 80
+      weight: 100
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+    timeout: 30s
+  
+  - match:
+    - uri:
+        prefix: /api/casting
+    route:
+    - destination:
+        host: casting-service
+        port:
+          number: 80
+      weight: 100
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+    timeout: 30s
+  
+  - match:
+    - uri:
+        prefix: /api/packaging
+    route:
+    - destination:
+        host: packaging-service
+        port:
+          number: 80
+      weight: 100
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+    timeout: 30s
+  
+  - match:
+    - uri:
+        prefix: /api/shipping
+    route:
+    - destination:
+        host: shipping-service
+        port:
+          number: 80
+      weight: 100
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+    timeout: 30s
+  
+  - match:
+    - uri:
+        prefix: /api/scrap-intake
+    route:
+    - destination:
+        host: scrap-intake-service
+        port:
+          number: 80
+      weight: 100
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+    timeout: 30s
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: steel-mill-dr
+  namespace: steel-mill
+spec:
+  host: "*.steel-mill.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+        consecutiveGatewayErrors: 5
+        interval: 30s
+        baseEjectionTime: 30s
+        maxEjectionPercent: 50
+    outlierDetection:
+      consecutiveGatewayErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: ml-inference-dr
+  namespace: steel-mill
+spec:
+  host: ml-inference-service
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      tcp:
+        maxConnections: 50
+      http:
+        http1MaxPendingRequests: 25
+        http2MaxRequests: 50
+        maxRequestsPerConnection: 5
+        maxRetries: 2
+        consecutiveGatewayErrors: 3
+        interval: 10s
+        baseEjectionTime: 10s
+        maxEjectionPercent: 30
+    outlierDetection:
+      consecutiveGatewayErrors: 3
+      interval: 10s
+      baseEjectionTime: 10s
+      maxEjectionPercent: 30
+  subsets:
+  - name: stable
+    labels:
+      version: stable
+  - name: canary
+    labels:
+      version: canary
