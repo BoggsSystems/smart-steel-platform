@@ -3,6 +3,10 @@ using CastingService.Models;
 
 namespace CastingService.Services;
 
+// LEGACY COMPATIBILITY NOTICE:
+// This service provides backward compatibility for existing integrations.
+// New development should use IRebarCastingDataService for rebar-specific features.
+
 public interface ICastingDataService
 {
     Task<CastingStatus?> GetCasterStatusAsync(string casterId);

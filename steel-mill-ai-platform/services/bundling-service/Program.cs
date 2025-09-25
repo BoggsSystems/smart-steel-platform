@@ -1,5 +1,5 @@
 using Azure.Messaging.EventHubs.Consumer;
-using PackagingService.Services;
+using BundlingService.Services;
 using Microsoft.Azure.Cosmos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -31,7 +31,7 @@ builder.Services.AddSingleton<CosmosClient>(sp =>
 });
 
 // Services
-builder.Services.AddSingleton<IPackagingDataService, PackagingDataService>();
+builder.Services.AddSingleton<IRebarBundlingDataService, RebarBundlingDataService>();
 
 // Azure clients
 builder.Services.AddAzureClients(clientBuilder =>
