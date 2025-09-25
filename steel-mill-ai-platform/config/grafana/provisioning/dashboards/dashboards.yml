@@ -1,0 +1,59 @@
+# Grafana dashboards configuration for Steel Mill AI Platform
+
+apiVersion: 1
+
+providers:
+  # Steel Mill Production Dashboards
+  - name: 'steel-mill-production'
+    orgId: 1
+    folder: 'Steel Mill Production'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/production
+
+  # Steel Mill Quality Dashboards
+  - name: 'steel-mill-quality'
+    orgId: 1
+    folder: 'Quality Control'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/quality
+
+  # Steel Mill Maintenance Dashboards
+  - name: 'steel-mill-maintenance'
+    orgId: 1
+    folder: 'Maintenance'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/maintenance
+
+  # Infrastructure Monitoring
+  - name: 'steel-mill-infrastructure'
+    orgId: 1
+    folder: 'Infrastructure'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/infrastructure
+
+  # ML Model Monitoring
+  - name: 'steel-mill-ml'
+    orgId: 1
+    folder: 'ML Models'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/ml-models

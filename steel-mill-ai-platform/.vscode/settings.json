@@ -1,0 +1,177 @@
+{
+  "python.defaultInterpreterPath": "./ml-pipeline/.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.mypyEnabled": true,
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": ["--line-length=100"],
+  "python.sortImports.args": ["--profile", "black"],
+  
+  "dotnet.defaultSolution": "SteelMillAI.sln",
+  "omnisharp.enableRoslynAnalyzers": true,
+  "omnisharp.enableEditorConfigSupport": true,
+  
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.pytest_cache": true,
+    "**/.venv": false
+  },
+  
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "**/bin": true,
+    "**/obj": true,
+    "**/__pycache__": true,
+    "**/.venv": true
+  },
+  
+  "files.associations": {
+    "*.yml": "yaml",
+    "*.yaml": "yaml",
+    "Dockerfile*": "dockerfile",
+    "*.json": "jsonc"
+  },
+  
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true,
+    "source.fixAll": true
+  },
+  
+  "yaml.schemas": {
+    "https://json.schemastore.org/docker-compose.json": "docker-compose*.yml",
+    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "docker-compose*.yml",
+    "https://json.schemastore.org/prometheus.json": "**/prometheus*.yml",
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
+  },
+  
+  "docker.defaultRegistryPath": "localhost:5000",
+  "docker.imageBuildContextPath": "${workspaceFolder}",
+  
+  "rest-client.environmentVariables": {
+    "local": {
+      "baseUrl": "http://localhost",
+      "furnacePort": "5001",
+      "qualityPort": "5002",
+      "rollingMillPort": "5003",
+      "mlPort": "8000"
+    }
+  },
+  
+  "terminal.integrated.env.osx": {
+    "ASPNETCORE_ENVIRONMENT": "Development",
+    "PYTHONPATH": "${workspaceFolder}/ml-pipeline"
+  },
+  
+  "terminal.integrated.env.linux": {
+    "ASPNETCORE_ENVIRONMENT": "Development",
+    "PYTHONPATH": "${workspaceFolder}/ml-pipeline"
+  },
+  
+  "terminal.integrated.env.windows": {
+    "ASPNETCORE_ENVIRONMENT": "Development",
+    "PYTHONPATH": "${workspaceFolder}/ml-pipeline"
+  },
+  
+  "launch": {
+    "configurations": [
+      {
+        "name": "Launch All Services",
+        "type": "compound",
+        "configurations": [
+          "Launch Furnace Service",
+          "Launch Quality Control Service",
+          "Launch ML Pipeline"
+        ]
+      }
+    ]
+  },
+  
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start Local Infrastructure",
+        "type": "shell",
+        "command": "./scripts/start-local-dev.sh",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Stop Local Infrastructure", 
+        "type": "shell",
+        "command": "./scripts/stop-local-dev.sh",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        }
+      },
+      {
+        "label": "Health Check",
+        "type": "shell", 
+        "command": "./scripts/health-check.sh",
+        "group": "test"
+      }
+    ]
+  },
+  
+  "extensions.recommendations": [
+    "ms-dotnettools.csharp",
+    "ms-dotnettools.csdevkit",
+    "ms-python.python",
+    "ms-python.flake8",
+    "ms-python.mypy-type-checker",
+    "ms-python.black-formatter",
+    "ms-python.isort",
+    "ms-azuretools.vscode-docker",
+    "redhat.vscode-yaml",
+    "humao.rest-client",
+    "ms-vscode.vscode-json",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "ms-vscode.azure-account",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "ms-vscode.powershell",
+    "formulahendry.auto-rename-tag"
+  ],
+  
+  "jupyter.askForKernelRestart": false,
+  "jupyter.jupyterServerType": "local",
+  
+  "git.ignoreLimitWarning": true,
+  "git.autofetch": true,
+  
+  "workbench.colorTheme": "Default Dark+",
+  "workbench.iconTheme": "vs-seti",
+  
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.cs": "${capture}.Designer.cs, ${capture}.generated.cs",
+    "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+    "*.ts": "${capture}.js, ${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+    "*.tsx": "${capture}.js, ${capture}.js.map",
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml",
+    "*.csproj": "*.csproj.user",
+    "*.sln": "*.sln.DotSettings, *.sln.DotSettings.user"
+  }
+}

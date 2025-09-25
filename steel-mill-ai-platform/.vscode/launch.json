@@ -1,0 +1,152 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Furnace Service",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-furnace-service",
+      "program": "${workspaceFolder}/services/furnace-service/bin/Debug/net9.0/FurnaceService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/services/furnace-service",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5001"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      }
+    },
+    {
+      "name": "Launch Quality Control Service",
+      "type": "coreclr", 
+      "request": "launch",
+      "preLaunchTask": "build-quality-control-service",
+      "program": "${workspaceFolder}/services/quality-control-service/bin/Debug/net9.0/QualityControlService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/services/quality-control-service",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally", 
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5002"
+      }
+    },
+    {
+      "name": "Launch Rolling Mill Service",
+      "type": "coreclr",
+      "request": "launch", 
+      "preLaunchTask": "build-rolling-mill-service",
+      "program": "${workspaceFolder}/services/rolling-mill-service/bin/Debug/net9.0/RollingMillService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/services/rolling-mill-service",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)", 
+        "uriFormat": "%s/swagger"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5003"
+      }
+    },
+    {
+      "name": "Launch Casting Service",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-casting-service", 
+      "program": "${workspaceFolder}/services/casting-service/bin/Debug/net9.0/CastingService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/services/casting-service",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5004"
+      }
+    },
+    {
+      "name": "Launch ML Pipeline",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/ml-pipeline/local_development_server.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/ml-pipeline",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/ml-pipeline",
+        "ENVIRONMENT": "local"
+      },
+      "args": []
+    },
+    {
+      "name": "Debug ML Model Training",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/ml-pipeline/train_models.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/ml-pipeline",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/ml-pipeline"
+      },
+      "args": ["--local", "--debug"]
+    },
+    {
+      "name": "Run Tests - All",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "tests/",
+        "-v",
+        "--tb=short"
+      ],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/ml-pipeline"
+      }
+    },
+    {
+      "name": "Attach to .NET Process",
+      "type": "coreclr",
+      "request": "attach"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Launch All Services",
+      "configurations": [
+        "Launch Furnace Service",
+        "Launch Quality Control Service", 
+        "Launch Rolling Mill Service",
+        "Launch ML Pipeline"
+      ],
+      "stopAll": true,
+      "preLaunchTask": "Start Local Infrastructure"
+    },
+    {
+      "name": "Launch Core Services",
+      "configurations": [
+        "Launch Furnace Service",
+        "Launch Quality Control Service",
+        "Launch ML Pipeline"
+      ],
+      "stopAll": true
+    }
+  ]
+}

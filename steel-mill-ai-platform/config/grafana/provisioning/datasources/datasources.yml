@@ -1,0 +1,77 @@
+# Grafana datasources configuration for Steel Mill AI Platform
+
+apiVersion: 1
+
+datasources:
+  # Prometheus for metrics
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://prometheus:9090
+    isDefault: true
+    version: 1
+    editable: true
+    jsonData:
+      httpMethod: POST
+      queryTimeout: 60s
+      timeInterval: 15s
+
+  # InfluxDB for time-series data
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    orgId: 1
+    url: http://influxdb:8086
+    database: sensor-data
+    user: steelmill
+    secureJsonData:
+      password: steelmill123
+    jsonData:
+      httpMode: GET
+      keepCookies: []
+    version: 1
+    editable: true
+
+  # MongoDB for document data (requires grafana-mongodb-datasource plugin)
+  - name: MongoDB
+    type: grafana-mongodb-datasource
+    access: proxy
+    orgId: 1
+    url: mongodb://steelmill:steelmill123@mongodb:27017/steelmill
+    database: steelmill
+    version: 1
+    editable: true
+    jsonData:
+      authType: credentials
+      tlsAuth: false
+      tlsAuthWithCACert: false
+
+  # Jaeger for tracing
+  - name: Jaeger
+    type: jaeger
+    access: proxy
+    orgId: 1
+    url: http://jaeger:16686
+    version: 1
+    editable: true
+    jsonData:
+      tracesToLogs:
+        datasourceUid: loki
+        tags: ['job', 'instance', 'pod', 'namespace']
+        mappedTags: [
+          { key: 'service.name', value: 'service' }
+        ]
+        mapTagNamesEnabled: false
+        spanStartTimeShift: 1h
+        spanEndTimeShift: 1h
+        filterByTraceID: false
+        filterBySpanID: false
+
+  # Local CSV/JSON data source for testing
+  - name: TestData
+    type: testdata
+    access: proxy
+    orgId: 1
+    version: 1
+    editable: true

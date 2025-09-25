@@ -1,0 +1,126 @@
+# Prometheus configuration for Steel Mill AI Platform local development
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Steel Mill microservices
+  - job_name: 'furnace-service'
+    static_configs:
+      - targets: ['host.docker.internal:5001']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'quality-control-service'
+    static_configs:
+      - targets: ['host.docker.internal:5002']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'rolling-mill-service'
+    static_configs:
+      - targets: ['host.docker.internal:5003']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'casting-service'
+    static_configs:
+      - targets: ['host.docker.internal:5004']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'ladle-metallurgy-service'
+    static_configs:
+      - targets: ['host.docker.internal:5005']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'heat-treatment-service'
+    static_configs:
+      - targets: ['host.docker.internal:5006']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'cutting-straightening-service'
+    static_configs:
+      - targets: ['host.docker.internal:5007']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'bundling-service'
+    static_configs:
+      - targets: ['host.docker.internal:5008']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'energy-management-service'
+    static_configs:
+      - targets: ['host.docker.internal:5009']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'maintenance-service'
+    static_configs:
+      - targets: ['host.docker.internal:5010']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'inventory-service'
+    static_configs:
+      - targets: ['host.docker.internal:5011']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  # ML Pipeline services
+  - job_name: 'ml-inference-service'
+    static_configs:
+      - targets: ['host.docker.internal:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Infrastructure services
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    metrics_path: '/metrics'
+
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['mongodb:27017']
+
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka:9101']
+    metrics_path: '/metrics'
+
+  - job_name: 'influxdb'
+    static_configs:
+      - targets: ['influxdb:8086']
+    metrics_path: '/metrics'
+
+  # Node exporter for system metrics (if needed)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['host.docker.internal:9100']
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Storage configuration
+storage:
+  tsdb:
+    retention.time: 15d
+    retention.size: 5GB

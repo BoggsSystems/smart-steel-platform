@@ -1,0 +1,340 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-furnace-service",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/services/furnace-service/FurnaceService.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "build-quality-control-service",
+      "command": "dotnet",
+      "type": "process", 
+      "args": [
+        "build",
+        "${workspaceFolder}/services/quality-control-service/QualityControlService.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "build-rolling-mill-service",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build", 
+        "${workspaceFolder}/services/rolling-mill-service/RollingMillService.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "build-casting-service",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/services/casting-service/CastingService.csproj", 
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "build-all-services",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "build-furnace-service",
+        "build-quality-control-service",
+        "build-rolling-mill-service",
+        "build-casting-service"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "clean-all",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "clean",
+        "${workspaceFolder}",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "restore-all", 
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "restore",
+        "${workspaceFolder}"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "test-dotnet",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "test",
+        "${workspaceFolder}",
+        "--logger:trx",
+        "--logger:console;verbosity=detailed"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "test-python",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "-m",
+        "pytest",
+        "tests/",
+        "-v",
+        "--tb=short",
+        "--cov=ml-pipeline",
+        "--cov-report=html"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "PYTHONPATH": "${workspaceFolder}/ml-pipeline"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Start Local Infrastructure",
+      "type": "shell",
+      "command": "./scripts/start-local-dev.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    },
+    {
+      "label": "Stop Local Infrastructure",
+      "type": "shell", 
+      "command": "./scripts/stop-local-dev.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Health Check",
+      "type": "shell",
+      "command": "./scripts/health-check.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Setup Python Environment",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "-m",
+        "venv",
+        ".venv"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/ml-pipeline"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Install Python Dependencies",
+      "type": "shell",
+      "command": ".venv/bin/pip", 
+      "args": [
+        "install",
+        "-r",
+        "requirements-local.txt"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/ml-pipeline"
+      },
+      "group": "build",
+      "dependsOn": "Setup Python Environment",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Format Python Code",
+      "type": "shell",
+      "command": ".venv/bin/black",
+      "args": [
+        ".",
+        "--line-length=100"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/ml-pipeline"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Lint Python Code",
+      "type": "shell", 
+      "command": ".venv/bin/flake8",
+      "args": [
+        ".",
+        "--max-line-length=100"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/ml-pipeline"
+      },
+      "group": "test"
+    },
+    {
+      "label": "Generate API Client",
+      "type": "shell",
+      "command": "dotnet", 
+      "args": [
+        "run",
+        "--project",
+        "tools/ApiClientGenerator"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Docker Build All",
+      "type": "shell",
+      "command": "docker-compose",
+      "args": [
+        "-f",
+        "docker-compose.dev.yml",
+        "build"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Docker Up",
+      "type": "shell",
+      "command": "docker-compose",
+      "args": [
+        "-f", 
+        "docker-compose.dev.yml",
+        "up",
+        "-d"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Docker Down",
+      "type": "shell",
+      "command": "docker-compose", 
+      "args": [
+        "-f",
+        "docker-compose.dev.yml",
+        "down"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Watch Logs - All Services",
+      "type": "shell",
+      "command": "docker-compose",
+      "args": [
+        "-f",
+        "docker-compose.dev.yml",
+        "logs",
+        "-f"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      },
+      "isBackground": true
+    }
+  ]
+}
