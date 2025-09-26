@@ -1,0 +1,101 @@
+{
+  "phase": "Phase 2: Data Pipeline & Integration Testing",
+  "timestamp": "2025-09-25T20:38:21.144758",
+  "results": {
+    "start_time": "2025-09-25 20:38:21.144758",
+    "test_modules": {
+      "Data Validation - Synthetic Data": {
+        "execution_time": 0.011091947555541992,
+        "tests_run": 0,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0,
+        "success_rate": 0,
+        "output": "setUpClass (tests.data_pipeline_tests.test_synthetic_data_validation.TestSyntheticDataValidation) ... ERROR\n\n======================================================================\nERROR: setUpClass (tests.data_pipeline_tests.test_synthetic_data_validation.TestSyntheticDataValidation)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/data_pipeline_tests/test_synthetic_data_validation.py\", line 35, in setUpClass\n    cls.defect_data = cls.defect_model.generate_synthetic_training_data(n_samples=5000)\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'RebarDefectDetectionModel' object has no attribute 'generate_synthetic_training_data'. Did you mean: 'generate_synthetic_defect_data'?\n\n----------------------------------------------------------------------\nRan 0 tests in 0.011s\n\nFAILED (errors=1)\n"
+      },
+      "Feature Engineering - Preprocessing": {
+        "execution_time": 0.0034270286560058594,
+        "tests_run": 0,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0,
+        "success_rate": 0,
+        "output": "setUpClass (tests.data_pipeline_tests.test_feature_engineering.TestFeatureEngineering) ... ERROR\n\n======================================================================\nERROR: setUpClass (tests.data_pipeline_tests.test_feature_engineering.TestFeatureEngineering)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/data_pipeline_tests/test_feature_engineering.py\", line 36, in setUpClass\n    cls.defect_data = cls.defect_model.generate_synthetic_training_data(n_samples=1000)\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'RebarDefectDetectionModel' object has no attribute 'generate_synthetic_training_data'. Did you mean: 'generate_synthetic_defect_data'?\n\n----------------------------------------------------------------------\nRan 0 tests in 0.003s\n\nFAILED (errors=1)\n"
+      },
+      "Model Training - Pipeline": {
+        "execution_time": 0.0037689208984375,
+        "tests_run": 0,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0,
+        "success_rate": 0,
+        "output": "setUpClass (tests.data_pipeline_tests.test_model_training_pipeline.TestModelTrainingPipeline) ... ERROR\n\n======================================================================\nERROR: setUpClass (tests.data_pipeline_tests.test_model_training_pipeline.TestModelTrainingPipeline)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/data_pipeline_tests/test_model_training_pipeline.py\", line 38, in setUpClass\n    cls.defect_data = cls.defect_model.generate_synthetic_training_data(n_samples=2000)\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'RebarDefectDetectionModel' object has no attribute 'generate_synthetic_training_data'. Did you mean: 'generate_synthetic_defect_data'?\n\n----------------------------------------------------------------------\nRan 0 tests in 0.004s\n\nFAILED (errors=1)\n"
+      },
+      "Batch Processing - Validation": {
+        "execution_time": 4.116696834564209,
+        "tests_run": 0,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0,
+        "success_rate": 0,
+        "output": "setUpClass (tests.data_pipeline_tests.test_batch_processing.TestBatchProcessing) ... ERROR\n\n======================================================================\nERROR: setUpClass (tests.data_pipeline_tests.test_batch_processing.TestBatchProcessing)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/data_pipeline_tests/test_batch_processing.py\", line 39, in setUpClass\n    cls._train_models()\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/data_pipeline_tests/test_batch_processing.py\", line 60, in _train_models\n    defect_data = cls.defect_model.generate_synthetic_training_data(n_samples=1000)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'RebarDefectDetectionModel' object has no attribute 'generate_synthetic_training_data'. Did you mean: 'generate_synthetic_defect_data'?\n\nStdout:\n\ud83e\udd16 Training models for batch processing tests...\n\n----------------------------------------------------------------------\nRan 0 tests in 4.117s\n\nFAILED (errors=1)\n"
+      },
+      "End-to-End - Workflow Simulation": {
+        "execution_time": 4.031535863876343,
+        "tests_run": 0,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0,
+        "success_rate": 0,
+        "output": "setUpClass (tests.workflow_tests.test_end_to_end_workflow.TestEndToEndWorkflow) ... ERROR\n\n======================================================================\nERROR: setUpClass (tests.workflow_tests.test_end_to_end_workflow.TestEndToEndWorkflow)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/workflow_tests/test_end_to_end_workflow.py\", line 430, in setUpClass\n    cls.simulator = RebarProductionSimulator()\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/workflow_tests/test_end_to_end_workflow.py\", line 68, in __init__\n    self._train_models()\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/workflow_tests/test_end_to_end_workflow.py\", line 109, in _train_models\n    defect_data = self.defect_model.generate_synthetic_training_data(n_samples=1000)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'RebarDefectDetectionModel' object has no attribute 'generate_synthetic_training_data'. Did you mean: 'generate_synthetic_defect_data'?\n\nStdout:\n\ud83e\udd16 Training ML models for production simulation...\n\n----------------------------------------------------------------------\nRan 0 tests in 4.031s\n\nFAILED (errors=1)\n"
+      }
+    },
+    "summary": {
+      "total_tests": 0,
+      "passed_tests": -5,
+      "failed_tests": 0,
+      "error_tests": 5,
+      "skipped_tests": 0
+    },
+    "performance_metrics": {},
+    "data_quality_metrics": {},
+    "workflow_metrics": {},
+    "end_time": "2025-09-25 20:38:30.092384",
+    "total_execution_time": 8.947626,
+    "overall_success_rate": 0
+  },
+  "config": {
+    "models": {
+      "quality_prediction": {
+        "accuracy_target": 0.9,
+        "r2_target": 0.85,
+        "response_time_ms": 200
+      },
+      "defect_detection": {
+        "accuracy_target": 0.85,
+        "confidence_threshold": 0.7,
+        "response_time_ms": 200
+      },
+      "predictive_maintenance": {
+        "false_positive_rate": 0.15,
+        "risk_threshold": 0.6,
+        "response_time_ms": 200
+      }
+    },
+    "api": {
+      "base_url": "http://localhost:8000",
+      "timeout": 10,
+      "max_concurrent_requests": 100
+    },
+    "data": {
+      "synthetic_samples": 10000,
+      "test_samples": 1000,
+      "batch_size": 100
+    }
+  },
+  "benchmarks": {
+    "max_throughput": 0,
+    "total_execution_time": 8.947626,
+    "success_rate": 0
+  }
+}
