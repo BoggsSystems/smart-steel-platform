@@ -131,10 +131,20 @@ class LocalConfig:
     debug: bool = True
     
     # Component configurations
-    database: DatabaseConfig = DatabaseConfig()
-    message_broker: MessageBrokerConfig = MessageBrokerConfig()
-    ml: MLConfig = MLConfig()
-    monitoring: MonitoringConfig = MonitoringConfig()
+    database: DatabaseConfig = None
+    message_broker: MessageBrokerConfig = None
+    ml: MLConfig = None
+    monitoring: MonitoringConfig = None
+    
+    def __post_init__(self):
+        if self.database is None:
+            self.database = DatabaseConfig()
+        if self.message_broker is None:
+            self.message_broker = MessageBrokerConfig()
+        if self.ml is None:
+            self.ml = MLConfig()
+        if self.monitoring is None:
+            self.monitoring = MonitoringConfig()
     
     # Security (disabled for local development)
     enable_authentication: bool = False
