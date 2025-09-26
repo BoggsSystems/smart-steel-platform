@@ -1,0 +1,93 @@
+{
+  "phase": "Phase 1: ML Core Functionality Testing",
+  "timestamp": "2025-09-25T20:16:05.906324",
+  "results": {
+    "start_time": "2025-09-25 20:16:05.906324",
+    "test_modules": {
+      "Unit Tests - Quality Prediction": {
+        "execution_time": 0.0001430511474609375,
+        "tests_run": 1,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0,
+        "success_rate": 0.0,
+        "output": "test_quality_prediction (unittest.loader._FailedTest.test_quality_prediction) ... ERROR\n\n======================================================================\nERROR: test_quality_prediction (unittest.loader._FailedTest.test_quality_prediction)\n----------------------------------------------------------------------\nImportError: Failed to import test module: test_quality_prediction\nTraceback (most recent call last):\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/loader.py\", line 137, in loadTestsFromName\n    module = __import__(module_name)\n             ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/unit_tests/test_quality_prediction.py\", line 17, in <module>\n    from models.rebar_quality_prediction import RebarQualityPredictionModel\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/unit_tests/../../models/rebar_quality_prediction.py\", line 3, in <module>\n    from sklearn.ensemble import RandomForestClassifier, GradientBoostingRegressor\nModuleNotFoundError: No module named 'sklearn'\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nFAILED (errors=1)\n"
+      },
+      "Unit Tests - Defect Detection": {
+        "execution_time": 9.417533874511719e-05,
+        "tests_run": 1,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0,
+        "success_rate": 0.0,
+        "output": "test_defect_detection (unittest.loader._FailedTest.test_defect_detection) ... ERROR\n\n======================================================================\nERROR: test_defect_detection (unittest.loader._FailedTest.test_defect_detection)\n----------------------------------------------------------------------\nImportError: Failed to import test module: test_defect_detection\nTraceback (most recent call last):\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/loader.py\", line 137, in loadTestsFromName\n    module = __import__(module_name)\n             ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/unit_tests/test_defect_detection.py\", line 17, in <module>\n    from models.rebar_defect_detection import RebarDefectDetectionModel\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/unit_tests/../../models/rebar_defect_detection.py\", line 3, in <module>\n    from sklearn.ensemble import IsolationForest, RandomForestClassifier\nModuleNotFoundError: No module named 'sklearn'\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nFAILED (errors=1)\n"
+      },
+      "Unit Tests - Predictive Maintenance": {
+        "execution_time": 9.083747863769531e-05,
+        "tests_run": 1,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 0,
+        "success_rate": 0.0,
+        "output": "test_predictive_maintenance (unittest.loader._FailedTest.test_predictive_maintenance) ... ERROR\n\n======================================================================\nERROR: test_predictive_maintenance (unittest.loader._FailedTest.test_predictive_maintenance)\n----------------------------------------------------------------------\nImportError: Failed to import test module: test_predictive_maintenance\nTraceback (most recent call last):\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/loader.py\", line 137, in loadTestsFromName\n    module = __import__(module_name)\n             ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/unit_tests/test_predictive_maintenance.py\", line 17, in <module>\n    from models.rebar_predictive_maintenance import RebarPredictiveMaintenanceModel\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/unit_tests/../../models/rebar_predictive_maintenance.py\", line 3, in <module>\n    from sklearn.ensemble import RandomForestClassifier, GradientBoostingRegressor\nModuleNotFoundError: No module named 'sklearn'\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nFAILED (errors=1)\n"
+      },
+      "Integration Tests - API Endpoints": {
+        "execution_time": 0.110382080078125,
+        "tests_run": 19,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "success_rate": 89.47368421052632,
+        "output": "test_api_documentation_endpoint (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_api_documentation_endpoint)\nTest API documentation endpoint (Swagger/OpenAPI) ... ok\ntest_concurrent_requests (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_concurrent_requests)\nTest API handling of concurrent requests ... ok\ntest_content_type_validation (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_content_type_validation)\nTest API content type validation ... FAIL\ntest_defect_detection_edge_cases (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_defect_detection_edge_cases)\nTest defect detection with edge case values ... ok\ntest_defect_detection_endpoint_success (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_defect_detection_endpoint_success)\nTest defect detection endpoint with valid data ... ok\ntest_error_response_format (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_error_response_format)\nTest error response format consistency ... ok\ntest_health_endpoint (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_health_endpoint)\nTest health check endpoint ... ok\ntest_http_methods_validation (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_http_methods_validation)\nTest API HTTP method validation ... ok\ntest_maintenance_prediction_endpoint_success (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_maintenance_prediction_endpoint_success)\nTest maintenance prediction endpoint with valid data ... ok\ntest_maintenance_prediction_high_risk (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_maintenance_prediction_high_risk)\nTest maintenance prediction with high-risk equipment ... ok\ntest_malformed_json_handling (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_malformed_json_handling)\nTest API handling of malformed JSON ... FAIL\ntest_quality_prediction_different_grades (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_quality_prediction_different_grades)\nTest quality prediction with different rebar grades ... ok\ntest_quality_prediction_endpoint_success (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_quality_prediction_endpoint_success)\nTest quality prediction endpoint with valid data ... ok\ntest_quality_prediction_invalid_data (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_quality_prediction_invalid_data)\nTest quality prediction with invalid data ... ok\ntest_quality_prediction_missing_fields (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_quality_prediction_missing_fields)\nTest quality prediction with missing optional fields ... ok\ntest_request_size_limits (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_request_size_limits)\nTest API request size handling ... ok\ntest_response_time_performance (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_response_time_performance)\nTest API response time performance ... ok\ntest_root_endpoint (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_root_endpoint)\nTest root endpoint returns HTML dashboard ... ok\ntest_synthetic_data_endpoint (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_synthetic_data_endpoint)\nTest synthetic data generation endpoint ... ok\n\n======================================================================\nFAIL: test_content_type_validation (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_content_type_validation)\nTest API content type validation\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/integration_tests/test_api_endpoints.py\", line 458, in test_content_type_validation\n    self.assertIn(response.status_code, [200, 400, 415])\nAssertionError: 422 not found in [200, 400, 415]\n\n======================================================================\nFAIL: test_malformed_json_handling (tests.integration_tests.test_api_endpoints.TestAPIEndpoints.test_malformed_json_handling)\nTest API handling of malformed JSON\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/jeffboggs/smart-steel/smart-steel-platform/steel-mill-ai-platform/ml-pipeline/tests/integration_tests/test_api_endpoints.py\", line 573, in test_malformed_json_handling\n    self.assertIn(response.status_code, [200, 400])\nAssertionError: 422 not found in [200, 400]\n\n----------------------------------------------------------------------\nRan 19 tests in 0.110s\n\nFAILED (failures=2)\n"
+      },
+      "Performance Tests - API Performance": {
+        "execution_time": 103.64049196243286,
+        "tests_run": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "success_rate": 100.0,
+        "output": "test_concurrent_request_handling (tests.performance_tests.test_api_performance.TestAPIPerformance.test_concurrent_request_handling)\nTest API performance under concurrent load ... ok\ntest_defect_detection_performance (tests.performance_tests.test_api_performance.TestAPIPerformance.test_defect_detection_performance)\nTest defect detection endpoint response time ... ok\ntest_error_handling_performance (tests.performance_tests.test_api_performance.TestAPIPerformance.test_error_handling_performance)\nTest performance of error handling ... ok\ntest_health_endpoint_performance (tests.performance_tests.test_api_performance.TestAPIPerformance.test_health_endpoint_performance)\nTest health endpoint response time ... ok\ntest_load_testing (tests.performance_tests.test_api_performance.TestAPIPerformance.test_load_testing)\nTest API under sustained load ... ok\ntest_maintenance_prediction_performance (tests.performance_tests.test_api_performance.TestAPIPerformance.test_maintenance_prediction_performance)\nTest maintenance prediction endpoint response time ... ok\ntest_memory_usage_monitoring (tests.performance_tests.test_api_performance.TestAPIPerformance.test_memory_usage_monitoring)\nTest API memory usage during operation ... ok\ntest_quality_prediction_performance (tests.performance_tests.test_api_performance.TestAPIPerformance.test_quality_prediction_performance)\nTest quality prediction endpoint response time ... ok\ntest_synthetic_data_performance (tests.performance_tests.test_api_performance.TestAPIPerformance.test_synthetic_data_performance)\nTest synthetic data endpoint response time ... ok\ntest_throughput_measurement (tests.performance_tests.test_api_performance.TestAPIPerformance.test_throughput_measurement)\nTest API throughput (requests per second) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 103.639s\n\nOK\n"
+      }
+    },
+    "summary": {
+      "total_tests": 32,
+      "passed_tests": 27,
+      "failed_tests": 2,
+      "error_tests": 3,
+      "skipped_tests": 0
+    },
+    "end_time": "2025-09-25 20:17:52.464756",
+    "total_execution_time": 106.558432,
+    "overall_success_rate": 84.375
+  },
+  "config": {
+    "models": {
+      "quality_prediction": {
+        "accuracy_target": 0.9,
+        "r2_target": 0.85,
+        "response_time_ms": 200
+      },
+      "defect_detection": {
+        "accuracy_target": 0.85,
+        "confidence_threshold": 0.7,
+        "response_time_ms": 200
+      },
+      "predictive_maintenance": {
+        "false_positive_rate": 0.15,
+        "risk_threshold": 0.6,
+        "response_time_ms": 200
+      }
+    },
+    "api": {
+      "base_url": "http://localhost:8000",
+      "timeout": 10,
+      "max_concurrent_requests": 100
+    },
+    "data": {
+      "synthetic_samples": 10000,
+      "test_samples": 1000,
+      "batch_size": 100
+    }
+  }
+}
